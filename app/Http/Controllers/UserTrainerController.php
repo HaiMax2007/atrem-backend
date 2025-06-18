@@ -3,17 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\UserTrainer;
-use App\Http\Requests\StoreUserTrainerRequest;
-use App\Http\Requests\UpdateUserTrainerRequest;
 
-class UserTrainerController extends Controller
+class UserTrainerController
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return response()->json([
+            'status' => 200,
+            'message' => 'Getting users successful',
+            'userTrainers' => UserTrainer::all()
+        ], 200);  
     }
 
     /**

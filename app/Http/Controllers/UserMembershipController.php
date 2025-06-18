@@ -3,17 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\UserMembership;
-use App\Http\Requests\StoreUserMembershipRequest;
-use App\Http\Requests\UpdateUserMembershipRequest;
 
-class UserMembershipController extends Controller
+class UserMembershipController
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return response()->json([
+            'status' => 200,
+            'message' => 'Getting users successful',
+            'userMemberships' => UserMembership::all()
+        ], 200);  
     }
 
     /**

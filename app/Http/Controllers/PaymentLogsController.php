@@ -2,65 +2,66 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Models\PaymentLogs;
-use App\Http\Requests\StorePaymentLogsRequest;
-use App\Http\Requests\UpdatePaymentLogsRequest;
+// use Illuminate\Routing\Controllers\HasMiddleware;
+// use Illuminate\Routing\Controllers\Middleware;
 
-class PaymentLogsController extends Controller
+class PaymentLogsController
 {
+    // public static function middleware(){
+    //     return [
+    //         new Middleware('auth:sanctum', except: ['uploadProof'])
+    //     ];
+    // }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StorePaymentLogsRequest $request)
-    {
-        //
+        return response()->json([
+            'status' => 200,
+            'message' => 'Getting all payment successful',
+            'paymentLogs' => PaymentLogs::all()
+        ], 200);  
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(PaymentLogs $paymentLogs)
+    public function show($id)
     {
-        //
+        $currPaymentLogs = PaymentLogs::where('id', $id)->first();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Getting a payment successful',
+            'paymentLog' => $currPaymentLogs
+        ], 200);  
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(PaymentLogs $paymentLogs)
+    public function uploadProof(Request $request, $paymentId)
     {
-        //
-    }
+        $request->validate([
+            'proof_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'notes' => 'string'
+        ]);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatePaymentLogsRequest $request, PaymentLogs $paymentLogs)
-    {
-        //
-    }
+        $payment = PaymentLogs::findOrFail($paymentId);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(PaymentLogs $paymentLogs)
-    {
-        //
+        $file = $request->file('proof_image');
+        $filename = time().'_'.$file->getClientOriginalName();
+        $file->move(public_path('uploads/proofs'), $filename);
+
+        $payment->proof_image = 'uploads/proofs/' . $filename;
+        $payment->notes = $request->notes;
+        $payment->save();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Proof of payment uploaded successfully.',
+            'payment' => $payment
+        ], 200); 
     }
 }

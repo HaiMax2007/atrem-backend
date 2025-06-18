@@ -6,14 +6,18 @@ use App\Models\Membership;
 use App\Http\Requests\StoreMembershipRequest;
 use App\Http\Requests\UpdateMembershipRequest;
 
-class MembershipController extends Controller
+class MembershipController
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return response()->json([
+            'status' => 200,
+            'message' => 'Getting memberships successful',
+            'memberships' => Membership::all()
+        ], 200); 
     }
 
     /**

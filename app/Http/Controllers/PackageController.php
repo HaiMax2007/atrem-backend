@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
+// use Illuminate\Routing\Controllers\HasMiddleware;
+// use Illuminate\Routing\Controllers\Middleware;
 use App\Models\User;
 use App\Models\UserMembership;
 use App\Models\Membership;
@@ -13,14 +13,14 @@ use App\Models\UserTrainer;
 use App\Models\PaymentLogs;
 use Carbon\Carbon;
 
-class PackageController implements HasMiddleware
+class PackageController
 {
 
-    public static function middleware(){
-        return [
-            new Middleware('auth:sanctum')
-        ];
-    }
+    // public static function middleware(){
+    //     return [
+    //         new Middleware('auth:sanctum', except: ['registerPackage'])
+    //     ];
+    // }
     
     public function registerPackage(Request $request)
     {
@@ -35,7 +35,7 @@ class PackageController implements HasMiddleware
             'method' => 'required|string',
         ]);
         
-        $packageType = $request->package_type === 'membership' ? 'membership' : 'pt';
+        $packageType = $request->package_type;
 
         if($packageType == 'membership') $request->validate(['package_type_id' => 'required|exists:memberships,id']);
         else $request->validate(['package_type_id' => 'required|exists:trainer_packages,id']);
@@ -47,7 +47,7 @@ class PackageController implements HasMiddleware
 
         $user = User::create($userCredentials);
 
-        if($packageType == 'membership') {
+        if($packageType === 'membership') {
             UserMembership::create([
                 'customer_id' => $user->id,
                 'membership_id' => $packageId,
@@ -74,7 +74,7 @@ class PackageController implements HasMiddleware
         return response()->json([
             'status' => 201,
             'message' => 'User has been created',
-            'user' => $user,
+            'user' => $packageType,
         ], 201);
     }
 
@@ -95,7 +95,7 @@ class PackageController implements HasMiddleware
         $userMembership->end_date = Carbon::now()->addDays($membership->duration_days);
         $userMembership->save();
 
-        $paymentLogs = PaymentLogs::where('customer_id', $userMembership->id)->latest()->first();
+        $paymentLogs = PaymentLogs::where('customer_id', $userMembership->customer_id)->latest()->first();
         $paymentLogs->status = 'paid';
         $paymentLogs->paid_at = Carbon::now();
         $paymentLogs->save();

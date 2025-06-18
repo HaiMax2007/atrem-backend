@@ -3,17 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\TrainerPackage;
-use App\Http\Requests\StoreTrainerPackageRequest;
-use App\Http\Requests\UpdateTrainerPackageRequest;
 
-class TrainerPackageController extends Controller
+class TrainerPackageController
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return response()->json([
+            'status' => 200,
+            'message' => 'Getting users successful',
+            'sessions' => TrainerPackage::all()
+        ], 200); 
     }
 
     /**

@@ -7,13 +7,13 @@ use Illuminate\Routing\Controllers\Middleware;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class UserController implements HasMiddleware
+class UserController
 {
-    public static function middleware(){
-        return [
-            new Middleware('auth:sanctum')
-        ];
-    }
+    // public static function middleware(){
+    //     return [
+    //         new Middleware('auth:sanctum')
+    //     ];
+    // }
 
     /**
      * Display a listing of the resource.
@@ -32,7 +32,7 @@ class UserController implements HasMiddleware
         return response()->json([
             'status' => 200,
             'message' => 'Getting trainers successful',
-            'users' => User::trainers()->get(),
+            'trainers' => User::trainers()->get(),
         ], 200);  
     }
 
@@ -41,23 +41,55 @@ class UserController implements HasMiddleware
         return response()->json([
             'status' => 200,
             'message' => 'Getting user successful',
-            'users' => User::admins()->get(),
+            'admins' => User::admins()->get(),
         ], 200);  
+    }
+
+    public function show($id)
+    {
+        $user = User::where('id', $id)->first();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Getting user successfully',
+            'user' => $user
+        ], 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, $id)
     {
-        //
+        $user = User::where('id', $id)->first();
+
+        $validatedData = $request->validate([
+            'full_name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|unique:users,email,' . $id,
+            'phone' => 'sometimes|string|max:20',
+            'age' => 'sometimes|integer',
+        ]);
+
+        $user->update($validatedData);
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'User updated successfully',
+            'user' => $user
+        ], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy($id)
     {
-        //
+        $user = User::where('id', $id)->first();
+        $user->delete();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'User deleted successfully'
+        ], 200);
     }
 }

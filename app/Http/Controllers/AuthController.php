@@ -16,7 +16,7 @@ class AuthController
 
         $user = User::where('email', $adminCredentials['email'])->where('role', 'admin')->first();
 
-        if (!$user || $user->password != $request->password) {
+        if (!$user || $user->password !== $request->password) {
             return response()->json([
                 'status' => 401,
                 'message' => 'Invalid credentials or not authorized'

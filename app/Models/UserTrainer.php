@@ -16,7 +16,6 @@ class UserTrainer extends Model
         'session_id',
         'start_date',
         'end_date',
-        'end_date',
         'session_left',
         'status',
     ];
