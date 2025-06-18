@@ -34,20 +34,18 @@ class PackageController
             'package_type_id' => 'required|integer',
             'method' => 'required|string',
         ]);
-        
-        $packageType = $request->package_type;
 
-        if($packageType == 'membership') $request->validate(['package_type_id' => 'required|exists:memberships,id']);
+        if($request->package_type == 'membership') $request->validate(['package_type_id' => 'required|exists:memberships,id']);
         else $request->validate(['package_type_id' => 'required|exists:trainer_packages,id']);
 
         $packageId = $request->package_type_id;
-        $price = $packageType === 'membership'
+        $price = $request->package_type === 'membership'
             ? Membership::where('id', $packageId)->value('price')
             : TrainerPackage::where('id', $packageId)->value('price');
 
         $user = User::create($userCredentials);
 
-        if($packageType === 'membership') {
+        if($request->package_type === 'membership') {
             UserMembership::create([
                 'customer_id' => $user->id,
                 'membership_id' => $packageId,
@@ -64,7 +62,7 @@ class PackageController
 
         PaymentLogs::create([
             'customer_id' => $user->id,
-            'package_type' => $packageType,
+            'package_type' => $request->package_type,
             'package_type_id' => $packageId,
             'amount' => $price,
             'method' => $request->method,
@@ -74,7 +72,7 @@ class PackageController
         return response()->json([
             'status' => 201,
             'message' => 'User has been created',
-            'user' => $packageType,
+            'user' => $user,
         ], 201);
     }
 

@@ -14,6 +14,7 @@ use App\Http\Controllers\PaymentLogsController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
 Route::get('/users', [UserController::class, 'index']);
 Route::get('/users/{id}', [UserController::class, 'show']);
 Route::get('/admins', [UserController::class, 'indexAdmin']);
@@ -35,4 +36,5 @@ Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
 Route::get('/payments', [PaymentLogsController::class, 'index']);
 Route::get('/payments/{id}', [PaymentLogsController::class, 'show']);
+
 Route::post('/payments/{id}', [PaymentLogsController::class, 'uploadProof']);
